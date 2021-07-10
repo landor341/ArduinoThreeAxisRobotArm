@@ -23,7 +23,7 @@ const int driveEnablePin=8;
 
 const int StepsPerRev=200; //steps on the actual stepper motor
 const int microStepRatio = 4; //4 microsteps / 1 full step
-const int gearRatio = 5; //5 motor rotations / 1 joint
+const float gearRatios[3] = {5, 4.25, 4.25}; //5 motor rotations / 1 joint
 
 
 const float revSteps = StepsPerRev * microStepRatio * gearRatio;
@@ -53,7 +53,7 @@ void setup() {
   joint0Motor.enableMotor(true);
   joint1Motor.enableMotor(true);
   joint2Motor.enableMotor(true);
-  arm.positionMode.ABSOLUTE;
+
   // delay(500);
   // Serial.println("motors enabled");
   // delay(500);
