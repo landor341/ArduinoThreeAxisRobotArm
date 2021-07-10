@@ -11,12 +11,14 @@
 
 
 
-a4988DriveModule::a4988DriveModule(int enablePin, int dirPin, int stepPin, int motorTicksPerRevolution, int maxRPM, int RPMAcceleration, float maxAngle) {
+a4988DriveModule::a4988DriveModule(int enablePin, int dirPin, int stepPin, int limitPin, int motorTicksPerRevolution, int maxRPM, float rpmAcceleration, float maxAngle, direction dirToSwitch) {
     enablePin_ = enablePin;
     dirPin_ = dirPin;
     stepPin_ = stepPin;
+    limitPin_ = limitPin;
+    dirToSwitch_ = dirToSwitch;
     maxTPS_ = rotationsToTicks(maxRPM) / 60;
-    TPSAcceleration_ = rotationsToTicks(RPMAcceleration) / 60;
+    TPSAcceleration_ = rotationsToTicks(rpmAcceleration) / 60;
     motorTicksPerRevolution_ = motorTicksPerRevolution;
     maxTicks_ = (int) degreesToTicks(maxAngle);
 
@@ -33,13 +35,13 @@ void a4988DriveModule::setDir(boolean clockwise) {
     motorClockwise = clockwise;
 }
 boolean a4988DriveModule::atRest() { return currentSteps == setSteps; }
-boolean a4988DriveModule::setPosition(float distance, bool isAbsolute, bool isTicks) {
-    if (isAbsolute == true) {
-        if (isTicks == true) setSteps = (int) distance;
-        else if (isTicks == false) setSteps = (int) degreesToTicks(distance); 
-    } else if (isAbsolute == false) {
-        if (isTicks == true) setSteps = currentSteps + (int) distance;
-        else if (isTicks == true) setSteps = currentSteps + (int) degreesToTicks(distance);
+boolean a4988DriveModule::setPosition(float distance, positionMode posMode, motorUnits units) {
+    if (posMode == ABSOLUTE) {
+        if (units == TICKS) setSteps = (int) distance;
+        else if (units == ANGLE) setSteps = (int) degreesToTicks(distance); 
+    } else if (posMode == RELATIVE) {
+        if (units == TICKS) setSteps = currentSteps + (int) distance;
+        else if (units == ANGLE) setSteps = currentSteps + (int) degreesToTicks(distance);
     }
 
     if (setSteps >= maxTicks_) {
@@ -55,9 +57,9 @@ void a4988DriveModule::halt() {
     currentVelocity = 0;
     enableMotor(false);
 }
-void a4988DriveModule::zero(int limitSwitchpin, boolean clockwiseToSwitch) {
-    setDir(clockwiseToSwitch);
-    while (!digitalRead(limitSwitchpin)) {
+void a4988DriveModule::zero() {
+    setDir(dirToSwitch_);
+    while (!digitalRead(limitPin_)) {
         incrementMotor();
         delay(3);
     }

@@ -8,19 +8,24 @@
 
 #include "Arduino.h"
 
+enum motorUnits {
+  TICKS = 1,
+  ANGLE = 0
+};
+enum positionMode {
+  ABSOLUTE = 1,
+  RELATIVE = 0
+};
+enum direction {
+  COUNTERCLOCKWISE = 0,
+  CLOCKWISE = 1
+};
+
 class a4988DriveModule
 {
   public:
-    enum motorUnits {
-      TICKS = 1,
-      ANGLE = 0
-    };
-    enum positionMode {
-      ABSOLUTE = 1,
-      RELATIVE = 0
-    };
 
-    a4988DriveModule(int enablePin, int dirPin, int stepPin, int motorTicksPerRevolution, int maxRPM, int RPMAcceleration, float maxAngle);
+    a4988DriveModule(int enablePin, int dirPin, int stepPin, int limitPin, int motorTicksPerRevolution, int maxRPM, float rpmAcceleration, float maxAngle, direction dirToSwitch);
     
     int getCurrentSteps();
     float getCurrentAngle();
@@ -32,11 +37,11 @@ class a4988DriveModule
 
     boolean atRest();
 
-    boolean setPosition(float distance, bool isAbsolute, bool isTicks);
+    boolean setPosition(float distance, positionMode posMode, motorUnits units);
 
     void update(double microsTime);
     void halt();
-    void zero(int limitSwitchpin, boolean clockwiseToSwitch);
+    void zero();
     int currentSteps = 0;
     int setSteps = 0;
 
@@ -50,6 +55,8 @@ class a4988DriveModule
     unsigned int enablePin_;
     unsigned int dirPin_;
     unsigned int stepPin_;
+    unsigned int limitPin_;
+    direction dirToSwitch_;
     unsigned int maxTPS_;
     unsigned int TPSAcceleration_;
     unsigned int maxTicks_;
