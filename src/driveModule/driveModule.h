@@ -34,7 +34,7 @@ class DriveModule
     virtual void halt()=0;
     virtual void zero()=0;
     int currentPosition = 0;
-    int setPosition = 0;
+    int desiredPosition = 0;
 
 
   private:

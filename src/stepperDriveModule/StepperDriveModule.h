@@ -16,44 +16,42 @@ enum motorUnits {
 
 struct stepperMotor {
   int enablePin, dirPin, stepPin;
-  int maxTickAccel, ticksPerRevolution, maxTPS;
-  stepperMotor(int enablePin, int dirPin, int stepPin, int ticksPerRevolution, int maxTPS, int maxTickAccel)
+  int accelerationLimit, ticksPerRevolution, maxVelocity;
+  stepperMotor(int enablePin, int dirPin, int stepPin, int ticksPerRevolution, int maxVelocity, int accelerationLimit)
   : enablePin(enablePin), dirPin(dirPin), stepPin(stepPin), 
-    ticksPerRevolution(ticksPerRevolution), maxTPS(maxTPS), maxTickAccel(maxTickAccel) 
+    ticksPerRevolution(ticksPerRevolution), maxVelocity(maxVelocity), accelerationLimit(accelerationLimit) 
     { }
 };
 
 class StepperDriveModule : public DriveModule
 {
   public:
-
-    StepperDriveModule(stepperMotor motor, int gearRatio, int microStepsPerStep, float maxAngle, int limitPin, direction dirToLimitSwitch);
+    virtual int getCurrentSteps()=0;
+    virtual float getCurrentAngle()=0;
+    virtual float getCurrentVelocity()=0;
     
-    int getCurrentSteps();
-    float getCurrentAngle();
-    float getCurrentVelocity();
-    
-    void enableMotor(boolean enable);
-    void setAngleOffset(float angleOffset);
+    virtual void enableMotor(boolean enable)=0;
+    virtual void setAngleOffset(float angleOffset)=0;
 
-    boolean atRest();
+    virtual boolean isAtRest()=0;
 
-    boolean setPosition(float distance, positionMode posMode);
-    boolean setPosition(float distance, positionMode posMode, motorUnits unit);
+    virtual boolean setPosition(float distance, positionMode posMode)=0;
+    virtual boolean setPosition(float distance, positionMode posMode, motorUnits unit)=0;
 
-    void update(double microsTime);
-    void halt();
-    void zero();
+    virtual void update(double microsTime)=0;
+    virtual void halt()=0;
+    virtual void zero()=0;
     int currentSteps = 0;
-    int setSteps = 0;
+    int desiredPosition = 0;
 
 
   private:
-    void setDir(boolean clockwise);
-    boolean incrementMotor();
-    int degreesToTicks(float angle);
-    float ticksToDegrees(int ticks);
-    int rotationsToTicks(float rotations);
+    virtual void setDir(boolean clockwise)=0;
+    virtual boolean incrementMotor()=0;
+    virtual int degreesToTicks(float angle)=0;
+    virtual float ticksToDegrees(int ticks)=0;
+    virtual int rotationsToTicks(float rotations)=0;
+    virtual int ticksToRotations(int ticks)=0;
 
     unsigned int enablePin;
     unsigned int dirPin;

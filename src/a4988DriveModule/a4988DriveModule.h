@@ -7,38 +7,10 @@
 #define a4988DriveModule_h
 
 #include "Arduino.h"
+#include "../StepperDriveModule/StepperDriveModule.h"
+#include "../DriveModule/DriveModule.h"
 
-enum motorUnits {
-  TICKS = 1,
-  ANGLE = 0
-};
-enum positionMode {
-  ABSOLUTE = 1,
-  RELATIVE = 0
-};
-enum direction {
-  COUNTERCLOCKWISE = 0,
-  CLOCKWISE = 1
-};
-
-struct stepperMotor {
-  int enablePin;
-  int dirPin;
-  int stepPin;
-  int ticksPerRevolution;
-  int maxTPS;
-  int maxTickAccel;
-  stepperMotor(int enablePin, int dirPin, int stepPin, int ticksPerRevolution, int maxTPS, int maxTickAccel)
-  : enablePin(enablePin),
-    dirPin(dirPin),
-    stepPin(stepPin),
-    ticksPerRevolution(ticksPerRevolution),
-    maxTPS(maxTPS),
-    maxTickAccel(maxTickAccel)
-  { }
-};
-
-class a4988DriveModule
+class a4988DriveModule : public DriveModule
 {
   public:
 
@@ -47,19 +19,21 @@ class a4988DriveModule
     int getCurrentSteps();
     float getCurrentAngle();
     float getCurrentVelocity();
-    
+
     void enableMotor(boolean enable);
     void setAngleOffset(float angleOffset);
 
-    boolean atRest();
-
+    boolean isAtRest();
+    
+    // boolean setPosition(float distance, positionMode posMode);
+    boolean setPosition(float distance, positionMode posMode);
     boolean setPosition(float distance, positionMode posMode, motorUnits units);
 
     void update(double microsTime);
     void halt();
     void zero();
-    int currentSteps = 0;
-    int setSteps = 0;
+    int currentPosition = 0;
+    int desiredPosition = 0;
 
 
   private:
@@ -68,24 +42,26 @@ class a4988DriveModule
     int degreesToTicks(float angle);
     float ticksToDegrees(int ticks);
     int rotationsToTicks(float rotations);
+    int ticksToRotations(int ticks);
 
     unsigned int enablePin;
     unsigned int dirPin;
     unsigned int stepPin;
     unsigned int limitPin;
     direction dirToSwitch;
-    unsigned int maxTPS;
+    unsigned int maxVelocity;
     unsigned int acceleration;
     unsigned int maxTicks;
+    unsigned int maxAngle;
 
     int ticksPerRevolution;
 
-    double lastIncrementTime = 0;
-    int currentVelocity = 0;
+    double lastIncrementTime {0};
+    int currentVelocity {0};
 
-    int angleOffset = 0;
-    boolean motorEnabled = false;
-    boolean motorClockwise = true;
+    int angleOffset {0};
+    boolean motorEnabled {false};
+    boolean motorClockwise {true};
 };
 
 #endif

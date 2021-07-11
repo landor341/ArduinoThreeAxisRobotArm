@@ -13,15 +13,15 @@ a4988DriveModule::a4988DriveModule(stepperMotor motor, int gearRatio, int microS
     stepPin(motor.stepPin),
     limitPin(limitPin),
     dirToSwitch(dirToSwitch),
-    maxTPS(motor.maxTPS),
-    acceleration(motor.maxTickAccel),
+    maxVelocity(motor.maxVelocity),
+    acceleration(motor.accelerationLimit * microStepsPerStep),
     ticksPerRevolution(motor.ticksPerRevolution * gearRatio / microStepsPerStep),
     maxTicks((int) degreesToTicks(maxAngle))
 {
     setDir(motorClockwise);
 } 
-int a4988DriveModule::getCurrentSteps() { return currentSteps; }
-float a4988DriveModule::getCurrentAngle() { return ticksToDegrees(currentSteps) + angleOffset; }
+int a4988DriveModule::getCurrentSteps() { return currentPosition; }
+float a4988DriveModule::getCurrentAngle() { return ticksToDegrees(currentPosition) + angleOffset; }
 float a4988DriveModule::getCurrentVelocity() { return currentVelocity; }
 void a4988DriveModule::setAngleOffset(float angleOffset) { angleOffset = angleOffset; }
 void a4988DriveModule::enableMotor(boolean enable) { motorEnabled = enable; }
@@ -30,26 +30,27 @@ void a4988DriveModule::setDir(boolean clockwise) {
     digitalWrite(dirPin, clockwise);
     motorClockwise = clockwise;
 }
-boolean a4988DriveModule::atRest() { return currentSteps == setSteps; }
+boolean a4988DriveModule::isAtRest() { return currentPosition == desiredPosition && currentVelocity == 0; }
 boolean a4988DriveModule::setPosition(float distance, positionMode posMode, motorUnits units) {
     if (posMode == ABSOLUTE) {
-        if (units == TICKS) setSteps = (int) distance;
-        else if (units == ANGLE) setSteps = (int) degreesToTicks(distance); 
+        if (units == TICKS) desiredPosition = (int) distance;
+        else if (units == ANGLE) desiredPosition = (int) degreesToTicks(distance); 
     } else if (posMode == RELATIVE) {
-        if (units == TICKS) setSteps = currentSteps + (int) distance;
-        else if (units == ANGLE) setSteps = currentSteps + (int) degreesToTicks(distance);
+        if (units == TICKS) desiredPosition = currentPosition + (int) distance;
+        else if (units == ANGLE) desiredPosition = currentPosition + (int) degreesToTicks(distance);
     }
 
-    if (setSteps >= maxTicks) {
-        setSteps = currentSteps;
+    if (desiredPosition > maxTicks || desiredPosition < 0) {
+        desiredPosition = currentPosition;
         return false;
     }
-    setDir(setSteps > currentSteps);
+    setDir(desiredPosition > currentPosition);
     enableMotor(true);
     return true;
 }
+boolean a4988DriveModule::setPosition(float distance, positionMode posMode) { return this->setPosition(distance, posMode, ANGLE); }
 void a4988DriveModule::halt() {
-    setSteps = currentSteps;
+    desiredPosition = currentPosition;
     currentVelocity = 0;
     enableMotor(false);
 }
@@ -59,22 +60,22 @@ void a4988DriveModule::zero() {
         incrementMotor();
         delay(3);
     }
-    currentSteps = 0;
+    currentPosition = 0;
     enableMotor(false);
 }
 void a4988DriveModule::update(double microsTime) {
-    if (setSteps == currentSteps) {
+    if (desiredPosition == currentPosition) {
         currentVelocity = 0;
         return;
     }
     double timeChange = (microsTime - lastIncrementTime);
 
-    float ticksRemaining = setSteps - currentSteps;
+    float ticksRemaining = desiredPosition - currentPosition;
     float minimumDistanceToZero = sq(currentVelocity) / (2 * acceleration);
     boolean deccelerate = minimumDistanceToZero >= ticksRemaining - 1;
 
     //calc current velocity
-    currentVelocity = min(maxTPS, max(1, currentVelocity + (acceleration * (deccelerate ? -1 : 1))));
+    currentVelocity = min(maxVelocity, max(1, currentVelocity + (acceleration * (deccelerate ? -1 : 1))));
 
     //increment motor if needed and set time
     if (timeChange / 1000000  >= 1 / currentVelocity) { //if seconds passed is more than current seconds per tick
@@ -87,14 +88,15 @@ void a4988DriveModule::update(double microsTime) {
 /* Private Methods */
 
 boolean a4988DriveModule::incrementMotor() { //TODO: add limit testing
-    if (motorEnabled && !digitalRead(limitPin) && currentSteps <= maxTicks) {
-        if (motorClockwise) currentSteps++; //cw
-        else currentSteps--; //ccw
+    if (motorEnabled && !digitalRead(limitPin) && currentPosition <= maxTicks) {
+        if (motorClockwise) currentPosition++; //cw
+        else currentPosition--; //ccw
         digitalWrite(stepPin,HIGH);
         // delayMicroseconds(1);
         digitalWrite(stepPin, LOW); //TODO: test for issues with timing
     }
 }
-float a4988DriveModule::ticksToDegrees(int ticks) { return currentSteps / (float) ticksPerRevolution * 360; }
+float a4988DriveModule::ticksToDegrees(int ticks) { return currentPosition / (float) ticksPerRevolution * 360; }
 int a4988DriveModule::degreesToTicks(float angle) { return (angle - angleOffset) / 360 * ticksPerRevolution; }
 int a4988DriveModule::rotationsToTicks(float rotations) { return rotations * ticksPerRevolution; }
+int a4988DriveModule::ticksToRotations(int ticks) { return ticks / ticksPerRevolution; }
