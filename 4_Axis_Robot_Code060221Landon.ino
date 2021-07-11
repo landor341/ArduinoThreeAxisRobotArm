@@ -5,7 +5,7 @@
  *                                        Questions or ideas
  * make another inverse kinematics that allows you to pass a vector  
  * I think the kinematics assumes the second joint is at z=0, negative z's might work but it's confusing
- *  
+ *  Deal with time function overflows
  */
 
 #include "src/ThreeAxisArmKinematics/ThreeAxisArmKinematics.h"

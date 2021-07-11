@@ -7,7 +7,7 @@
 #define ThreeAxisArm_h
 
 #include "Arduino.h"
-#include "../a4988DriveModule/a4988DriveModule.h"
+#include "../DriveModule/DriveModule.h"
 
 enum joints {
   BASE = 0,
@@ -20,9 +20,9 @@ class ThreeAxisArm
   public:
 
 
-    ThreeAxisArm();
+    ThreeAxisArm(DriveModule& baseJoint, DriveModule& shoulderJoint, DriveModule& elbowJoint);
 
-    void calibrateMotors(int enablePin[3], int dirPin[3], int stepPin[3], int motorTicksPerRevolution[3], int maxRPM[3], int RPMAcceleration[3], float maxAngle[3]); //also zeroes
+    void calibrateMotors(int enablePin[3], int dirPin[3], int stepPin[3], int limitPin[3], int motorTicksPerRevolution[3], int maxRPM[3], float rpmAcceleration[3], float maxAngle[3], direction dirToSwitch[3]); //also zeroes
 
     void zeroMotors(int limitSwitchPins[], direction dirToSwitch[3]);
 
@@ -39,10 +39,10 @@ class ThreeAxisArm
     boolean atRest();
     
   private:
-    void moveMotor(joints joint, float distance, positionMode posMode, motorUnits unit);
-    void moveMotor(float distance[3], positionMode posMode, motorUnits unit);
+    void moveMotor(joints joint, float distance, positionMode posMode);
+    void moveMotor(float distance[3], positionMode posMode);
 
-    a4988DriveModule driveModules[3];
+    DriveModule * driveModules[3];
 };
 
 #endif

@@ -21,18 +21,34 @@ enum direction {
   CLOCKWISE = 1
 };
 
+struct stepperMotor {
+  int enablePin;
+  int dirPin;
+  int stepPin;
+  int ticksPerRevolution;
+  int maxTPS;
+  int maxTickAccel;
+  stepperMotor(int enablePin, int dirPin, int stepPin, int ticksPerRevolution, int maxTPS, int maxTickAccel)
+  : enablePin(enablePin),
+    dirPin(dirPin),
+    stepPin(stepPin),
+    ticksPerRevolution(ticksPerRevolution),
+    maxTPS(maxTPS),
+    maxTickAccel(maxTickAccel)
+  { }
+};
+
 class a4988DriveModule
 {
   public:
 
-    a4988DriveModule(int enablePin, int dirPin, int stepPin, int limitPin, int motorTicksPerRevolution, int maxRPM, float rpmAcceleration, float maxAngle, direction dirToSwitch);
+    a4988DriveModule(stepperMotor motor, int gearRatio, int microStepsPerStep, float maxAngle, int limitPin, direction dirToSwitch);
     
     int getCurrentSteps();
     float getCurrentAngle();
     float getCurrentVelocity();
     
     void enableMotor(boolean enable);
-    void setDir(boolean clockwise);
     void setAngleOffset(float angleOffset);
 
     boolean atRest();
@@ -47,26 +63,27 @@ class a4988DriveModule
 
 
   private:
+    void setDir(boolean clockwise);
     boolean incrementMotor();
     int degreesToTicks(float angle);
     float ticksToDegrees(int ticks);
     int rotationsToTicks(float rotations);
 
-    unsigned int enablePin_;
-    unsigned int dirPin_;
-    unsigned int stepPin_;
-    unsigned int limitPin_;
-    direction dirToSwitch_;
-    unsigned int maxTPS_;
-    unsigned int TPSAcceleration_;
-    unsigned int maxTicks_;
+    unsigned int enablePin;
+    unsigned int dirPin;
+    unsigned int stepPin;
+    unsigned int limitPin;
+    direction dirToSwitch;
+    unsigned int maxTPS;
+    unsigned int acceleration;
+    unsigned int maxTicks;
 
-    int motorTicksPerRevolution_;
+    int ticksPerRevolution;
 
     double lastIncrementTime = 0;
     int currentVelocity = 0;
 
-    int angleOffset_ = 0;
+    int angleOffset = 0;
     boolean motorEnabled = false;
     boolean motorClockwise = true;
 };
