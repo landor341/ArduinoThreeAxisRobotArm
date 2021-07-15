@@ -14,6 +14,14 @@ enum motorUnits {
   ANGLE = 0
 };
 
+struct stepperMotorLimit {
+  int limitSwitchPin;
+  direction directionToLimitSwitch;
+  float maxAngle;
+  stepperMotorLimit(int limitSwitchPin, direction directionToLimitSwitch, float maxAngle)
+  : limitSwitchPin(limitSwitchPin), directionToLimitSwitch(directionToLimitSwitch), maxAngle(maxAngle) {}
+};
+
 struct stepperMotor {
   int enablePin, dirPin, stepPin;
   int accelerationLimit, ticksPerRevolution, maxVelocity;

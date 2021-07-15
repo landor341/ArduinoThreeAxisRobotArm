@@ -58,7 +58,7 @@ void a4988DriveModule::zero() {
     setDir(dirToSwitch);
     while (!digitalRead(limitPin)) {
         incrementMotor();
-        delay(3);
+        delay(2);
     }
     currentPosition = 0;
     enableMotor(false);

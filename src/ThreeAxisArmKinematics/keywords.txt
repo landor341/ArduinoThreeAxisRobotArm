@@ -5,10 +5,10 @@ inverseKinematics KEYWORD1
 getPosition KEYWORD1
 getAngles KEYWORD1
 
-joint2Length_ KEYWORD2
-joint3Length_ KEYWORD2
-j1Offs_ KEYWORD2
-j2Offs_ KEYWORD2
+shoulderJointLength KEYWORD2
+elbowJointLength KEYWORD2
+baseJointOffset KEYWORD2
+shoulderJointOffset KEYWORD2
 coords KEYWORD2
 angles KEYWORD2
 Pi KEYWORD2
