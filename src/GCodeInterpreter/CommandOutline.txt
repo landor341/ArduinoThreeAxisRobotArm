@@ -1,0 +1,14 @@
+Syntax 	Definition
+"G0 Xnn.n Ynn.n Znn.n Wnn.n" 	Fast Movement to X Y Z [mm] position. [Optional] set approach angle W.
+"G1 Xnn.n Ynn.n Znn.n Wnn.n Fnn.n" 	Controlled Movement to X Y Z [mm] position. [Optional] set speed F [mm/s]. [Optional] set approach angle W.
+"G28" 	Home position.
+"G53 Ann.n Bnn.n Cnn.n Dnn.n Enn.n Fnn.n" 	Move each servo individually at nn.n in degrees. Each parameter is optional.
+
+"G90" Absolute programming mode 
+"G91" Relative programming mode
+
+
+M Codes
+Syntax 	Definition
+M100 	Close grip.
+M101 	Open grip.
