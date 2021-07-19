@@ -1,4 +1,49 @@
 /*
+  GCodeInterpreter.cpp - Class for interpreting gcode from serial monitor into commands for robot arm classes.
+  Created by Landon R. Faris, June 2, 2021.
+*/
+
+#ifndef GCodeInterpreter_h
+#define GCodeInterpreter_h
+
+#include "Arduino.h"
+#include "../ThreeAxisArm/ThreeAxisArm.h"
+
+struct GCodeCommandField {
+    char identifier;
+    float fieldValue;
+
+    GCodeCommandField(char identifier=NULL, float fieldValue=0)
+    :identifier(identifier), fieldValue(fieldValue) {}
+};
+
+struct GCodeCommand {
+    unsigned char codeType;
+    uint8_t codeNum:3;
+    GCodeCommandField commandParameters[7];
+
+    GCodeCommand(char codeType, uint8_t codeNum, unsigned char * parameters, GCodeCommandField commandParameters[7]) 
+    :codeType(codeType), codeNum(codeNum), //I couldn't find a better way to get a parameter array to a member array in an initializer list 
+    commandParameters{commandParameters[0], commandParameters[1], commandParameters[2], commandParameters[3], commandParameters[4], commandParameters[5], commandParameters[6]} 
+    {}
+
+    GCodeCommand() :codeType(0), codeNum(0), commandParameters{ 0 } {}
+};
+
+class GCodeInterpreter {
+    public:
+        GCodeInterpreter();
+        
+        void setBufferLength(int bufferLength);
+        int getBufferLength();
+
+    private:
+        GCodeCommand commandBuffer[100]{ GCodeCommand() };
+};
+
+#endif
+
+/*
 
 Will use gcode reference these two sources:
 https://github.com/cgxeiji/CGx-Gcode-RobotArm
