@@ -22,7 +22,7 @@ struct GCodeCommand {
     uint8_t codeNum:3;
     GCodeCommandField commandParameters[7];
 
-    GCodeCommand(char codeType, uint8_t codeNum, unsigned char * parameters, GCodeCommandField commandParameters[7]) 
+    GCodeCommand(char codeType, uint8_t codeNum, GCodeCommandField commandParameters[7]) 
     :codeType(codeType), codeNum(codeNum), //I couldn't find a better way to get a parameter array to a member array in an initializer list 
     commandParameters{commandParameters[0], commandParameters[1], commandParameters[2], commandParameters[3], commandParameters[4], commandParameters[5], commandParameters[6]} 
     {}
@@ -32,13 +32,23 @@ struct GCodeCommand {
 
 class GCodeInterpreter {
     public:
-        GCodeInterpreter();
-        
-        void setBufferLength(int bufferLength);
+        GCodeInterpreter(int bufferLength=100);
+
         int getBufferLength();
 
+        boolean interpretCommandString(String str);
+        boolean addCommand(GCodeCommand command);
+
+        GCodeCommand getNextCommand();
+        void emptyBuffer();
+
+
     private:
-        GCodeCommand commandBuffer[100]{ GCodeCommand() };
+        void incrementBufferArray();
+
+        unsigned int numberOfCommands = 0;
+        unsigned int bufferLength;
+        GCodeCommand * commandBuffer;
 };
 
 #endif
