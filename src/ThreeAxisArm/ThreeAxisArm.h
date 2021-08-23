@@ -18,7 +18,7 @@ enum joints {
 class ThreeAxisArm
 {
   public:
-    ThreeAxisArm(DriveModule& baseJoint, DriveModule& shoulderJoint, DriveModule& elbowJoint);
+    ThreeAxisArm(DriveModule& baseJoint, DriveModule& shoulderJoint, DriveModule& elbowJoint, int enablePin);
 
     void update();
     void halt();
@@ -26,8 +26,9 @@ class ThreeAxisArm
     void zero();
     void setPosition(float x, float y, float z);
     void setJointAngle(float angle, joints joint);
+    void enableArm(boolean en);
 
-
+    int enablePin;
     boolean isAtRest();
     float * getPosition();
     

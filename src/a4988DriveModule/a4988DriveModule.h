@@ -43,7 +43,10 @@ class a4988DriveModule : public DriveModule
     float ticksToDegrees(int ticks);
     int rotationsToTicks(float rotations);
     int ticksToRotations(int ticks);
+    bool atSwitch();
 
+    int ticksPerRevolution;
+    
     unsigned int enablePin;
     unsigned int dirPin;
     unsigned int stepPin;
@@ -51,15 +54,14 @@ class a4988DriveModule : public DriveModule
     direction dirToSwitch;
     unsigned int maxVelocity;
     unsigned int acceleration;
-    unsigned int maxTicks;
+    int maxTicks;
     unsigned int maxAngle;
 
-    int ticksPerRevolution;
 
-    double lastIncrementTime {0};
-    int currentVelocity {0};
+    double lastIncrementTime = 0;
+    int currentVelocity = 0;
 
-    int angleOffset {0};
+    int angleOffset = 0;
     boolean motorEnabled {false};
     boolean motorClockwise {true};
 };
