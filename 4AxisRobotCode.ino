@@ -58,22 +58,24 @@ void setup() {
   for (int pin : dirPins) { pinMode(pin, OUTPUT); }
   for (int pin : stepPins) { pinMode(pin, OUTPUT); }
   pinMode(driveEnablePin, OUTPUT);
+  digitalWrite(driveEnablePin, HIGH);
   for (int pin : limitPins) { pinMode(pin, INPUT_PULLUP); }
 
-  driveModules[BASE].enableMotor(true);
   Serial.begin(9600);
   delay(1000);
-  Serial.println("here");
+  Serial.println("Initialized");
 }
 
 
 void loop() {
-  digitalWrite(driveEnablePin, LOW);
+  digitalWrite(driveEnablePin, HIGH);
   if (Serial.available() > 0) {
-    for (a4988DriveModule joint : driveModules) {
-      joint.zero();
+    digitalWrite(driveEnablePin, LOW);
+    for (int i = (sizeof(driveModules) / sizeof(driveModules[0])) - 1; i>=0; i--) {
+      driveModules[i].zero();
       delay(1000);
     }
+    digitalWrite(driveEnablePin, HIGH);
     delay(50000);
   }
 }

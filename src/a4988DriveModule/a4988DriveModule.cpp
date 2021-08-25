@@ -61,18 +61,20 @@ void a4988DriveModule::zero() {
     while (!atSwitch()) {
         enableMotor(true);
         incrementMotor();
-        delay(25);
+        delay(2);
     }
     currentPosition = 0;
-    
+    delay(10);
+
     setDir(!dirToSwitch);
     while (atSwitch()) {
         enableMotor(true);
         incrementMotor();
-        delay(2);
+        delay(5);
     }
 
-    enableMotor(false);
+    setPosition(0, ABSOLUTE);
+    halt();
 }
 void a4988DriveModule::update(double microsTime) {
     if (desiredPosition == currentPosition) {
@@ -99,9 +101,6 @@ void a4988DriveModule::update(double microsTime) {
 /* Private Methods */
 
 boolean a4988DriveModule::incrementMotor() { //TODO: add limit testing
-    
-    
-
     if (motorEnabled) {
         if (motorClockwise) currentPosition++; //cw
         else currentPosition--; //ccw
@@ -109,7 +108,7 @@ boolean a4988DriveModule::incrementMotor() { //TODO: add limit testing
         // delayMicroseconds(1);
         digitalWrite(stepPin, LOW); //TODO: test for issues with timing
     }
-    if (atSwitch() || currentPosition > maxTicks) halt();
+    if ((atSwitch() && motorClockwise == dirToSwitch) || currentPosition > maxTicks) halt();
 }
 float a4988DriveModule::ticksToDegrees(int ticks) { return currentPosition / (float) ticksPerRevolution * 360; }
 int a4988DriveModule::degreesToTicks(float angle) { return (int) ((angle - angleOffset) * ticksPerRevolution / 360); }
