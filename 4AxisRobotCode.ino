@@ -24,18 +24,22 @@ const unsigned int stepPins[numJoints] = {2, 3, 4};
 const unsigned int limitPins[numJoints] = {9, 10, 11};
 const int driveEnablePin = 8;
 
+int maxTPS[numJoints] = {3000, 1200, 1200};
+
 ThreeAxisArmKinematics kinematics(130, 160, 142.9, 25.4); 
 
 stepperMotor motors[numJoints] = {
-  stepperMotor(driveEnablePin, dirPins[BASE], stepPins[BASE], 200, 100, 200),
+  stepperMotor(driveEnablePin, dirPins[BASE], stepPins[BASE], 200, 3000, 200),
   stepperMotor(driveEnablePin, dirPins[SHOULDER], stepPins[SHOULDER], 200, 100, 200),
   stepperMotor(driveEnablePin, dirPins[ELBOW], stepPins[ELBOW], 200, 100, 200)
 };
 
+int maxAngles[numJoints] = {170, 90, 90};
+
 a4988DriveModule driveModules[numJoints] = {
-  a4988DriveModule(motors[BASE], gearRatios[BASE], microStepRatio, 90, limitPins[BASE], COUNTERCLOCKWISE), 
-  a4988DriveModule(motors[SHOULDER], gearRatios[SHOULDER], microStepRatio, 90, limitPins[SHOULDER], CLOCKWISE), 
-  a4988DriveModule(motors[ELBOW], gearRatios[ELBOW], microStepRatio, 90, limitPins[ELBOW], COUNTERCLOCKWISE)
+  a4988DriveModule(motors[BASE], gearRatios[BASE], microStepRatio, maxAngles[BASE], limitPins[BASE], COUNTERCLOCKWISE), 
+  a4988DriveModule(motors[SHOULDER], gearRatios[SHOULDER], microStepRatio, maxAngles[SHOULDER], limitPins[SHOULDER], CLOCKWISE), 
+  a4988DriveModule(motors[ELBOW], gearRatios[ELBOW], microStepRatio, maxAngles[ELBOW], limitPins[ELBOW], COUNTERCLOCKWISE)
 };
 
 ThreeAxisArm arm(driveModules[BASE], driveModules[SHOULDER], driveModules[ELBOW], driveEnablePin);
@@ -67,31 +71,46 @@ void setup() {
 }
 
 
-void loop() {
+void loop() { //single joint testing
   digitalWrite(driveEnablePin, HIGH);
-  if (Serial.available() > 0) {
+  if (Serial.available()) {
     digitalWrite(driveEnablePin, LOW);
-    for (int i = (sizeof(driveModules) / sizeof(driveModules[0])) - 1; i>=0; i--) {
-      driveModules[i].zero();
-      delay(1000);
+    driveModules[BASE].enableMotor(true);
+
+    driveModules[BASE].zero();
+    Serial.println("Current Angle: " + (String) driveModules[BASE].getCurrentSteps());
+
+    delay(3000);
+
+    Serial.print("Parsed Int: ");
+    int sentInt = Serial.parseInt();
+    Serial.println((String) sentInt);
+
+    driveModules[BASE].setPosition(90, ABSOLUTE, ANGLE);
+    while (!driveModules[BASE].isAtRest()) {
+      driveModules[BASE].update(micros());
+      delayMicroseconds(200);
     }
+    Serial.println("Current Angle: " + (String) driveModules[BASE].getCurrentSteps());
+
     digitalWrite(driveEnablePin, HIGH);
-    delay(50000);
+    delay(100000);
   }
 }
 
-
-
-
-// void loop() { //single joint testing
-//   digitalWrite(driveEnablePin, LOW);
-//   driveModules[BASE].enableMotor(true);
-
-//   driveModules[BASE].setPosition(30, ABSOLUTE, TICKS);
-//   driveModules[BASE].update(micros());
-//   // Serial.println((String) driveModules[BASE].getCurrentSteps());
-//   delay(100);
+// void loop() {
+//   digitalWrite(driveEnablePin, HIGH);
+//   if (Serial.available() > 0) {
+//     digitalWrite(driveEnablePin, LOW);
+//     for (int i = (sizeof(driveModules) / sizeof(driveModules[0])) - 1; i>=0; i--) {
+//       driveModules[i].zero();
+//       delay(1000);
+//     }
+//     digitalWrite(driveEnablePin, HIGH);
+//     delay(50000);
+//   }
 // }
+
 
 // loop() { //idek
   // currentMicros = micros();

@@ -13,9 +13,9 @@ a4988DriveModule::a4988DriveModule(stepperMotor motor, int gearRatio, int microS
     stepPin(motor.stepPin),
     limitPin(limitPin),
     dirToSwitch(dirToSwitch),
-    maxVelocity(motor.maxVelocity),
+    maxVelocity((int) round(motor.maxVelocity)),
     acceleration((int) (motor.accelerationLimit * microStepsPerStep)),
-    ticksPerRevolution((int) (motor.ticksPerRevolution * gearRatio / microStepsPerStep)),
+    ticksPerRevolution((int) (motor.ticksPerRevolution * gearRatio * microStepsPerStep)),
     maxTicks(degreesToTicks(maxAngle))
 {
     setDir(motorClockwise);
@@ -55,43 +55,46 @@ void a4988DriveModule::halt() {
     enableMotor(false);
 }
 void a4988DriveModule::zero() {
-    setDir(dirToSwitch);
-    enableMotor(true);
-    
-    while (!atSwitch()) {
+    if (motorEnabled) {
+        setDir(dirToSwitch);
         enableMotor(true);
-        incrementMotor();
-        delay(2);
-    }
-    currentPosition = 0;
-    delay(10);
+        
+        while (!atSwitch()) {
+            enableMotor(true);
+            incrementMotor();
+            delay(2);
+        }
+        setPosition(0, ABSOLUTE);
+        halt();
+        
+        currentPosition = 0;
+        delay(10);
 
-    setDir(!dirToSwitch);
-    while (atSwitch()) {
-        enableMotor(true);
-        incrementMotor();
-        delay(5);
-    }
+        setDir(!dirToSwitch);
+        while (atSwitch()) {
+            enableMotor(true);
+            incrementMotor();
+            delay(5);
+        }
 
-    setPosition(0, ABSOLUTE);
-    halt();
+        halt();
+    }
 }
 void a4988DriveModule::update(double microsTime) {
     if (desiredPosition == currentPosition) {
         currentVelocity = 0;
         return;
     }
+
     double timeChange = (microsTime - lastIncrementTime);
 
     float ticksRemaining = desiredPosition - currentPosition;
     float minimumDistanceToZero = sq(currentVelocity) / (2 * acceleration);
     boolean deccelerate = minimumDistanceToZero >= ticksRemaining - 1;
 
-    //calc current velocity
-    currentVelocity = min(maxVelocity, max(1, currentVelocity + (acceleration * (deccelerate ? -1 : 1))));
+    currentVelocity = min(maxVelocity, max(1, currentVelocity + (int) round(acceleration * (deccelerate ? -1 : 1))));
 
-    //increment motor if needed and set time
-    if (timeChange / 1000000  >= 1 / currentVelocity) { //if seconds passed is more than current seconds per tick
+    if ((float) (timeChange / 1000000)  >= (1 / (float) currentVelocity)) { //if seconds passed is more than current seconds per tick
         incrementMotor();
         lastIncrementTime = microsTime;
     }

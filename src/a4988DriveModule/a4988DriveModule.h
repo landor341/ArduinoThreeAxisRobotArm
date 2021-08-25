@@ -53,7 +53,7 @@ class a4988DriveModule : public DriveModule
     unsigned int limitPin;
     direction dirToSwitch;
     unsigned int maxVelocity;
-    unsigned int acceleration;
+    float acceleration;
     int maxTicks;
     unsigned int maxAngle;
 

@@ -24,8 +24,9 @@ struct stepperMotorLimit {
 
 struct stepperMotor {
   int enablePin, dirPin, stepPin;
-  int accelerationLimit, ticksPerRevolution, maxVelocity;
-  stepperMotor(int enablePin, int dirPin, int stepPin, int ticksPerRevolution, int maxVelocity, int accelerationLimit)
+  int ticksPerRevolution;
+  float accelerationLimit, maxVelocity; 
+  stepperMotor(int enablePin, int dirPin, int stepPin, int ticksPerRevolution, float maxVelocity, float accelerationLimit)
   : enablePin(enablePin), dirPin(dirPin), stepPin(stepPin), 
     ticksPerRevolution(ticksPerRevolution), maxVelocity(maxVelocity), accelerationLimit(accelerationLimit) 
     { }
