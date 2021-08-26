@@ -71,63 +71,17 @@ void setup() {
 }
 
 
-void loop() { //single joint testing
-  digitalWrite(driveEnablePin, HIGH);
-  if (Serial.available()) {
-    digitalWrite(driveEnablePin, LOW);
-    driveModules[BASE].enableMotor(true);
 
-    driveModules[BASE].zero();
-    Serial.println("Current Angle: " + (String) driveModules[BASE].getCurrentSteps());
+void loop() { //single joint testing
+  if (Serial.available()) {
+    Serial.println("gotchu");
+    arm.enableArm(true);
 
     delay(3000);
 
-    Serial.print("Parsed Int: ");
-    int sentInt = Serial.parseInt();
-    Serial.println((String) sentInt);
-
-    driveModules[BASE].setPosition(90, ABSOLUTE, ANGLE);
-    while (!driveModules[BASE].isAtRest()) {
-      driveModules[BASE].update(micros());
-      delayMicroseconds(200);
-    }
-    Serial.println("Current Angle: " + (String) driveModules[BASE].getCurrentSteps());
-
-    digitalWrite(driveEnablePin, HIGH);
+    arm.enableArm(false);
+    Serial.println("finished zeroing");
     delay(100000);
   }
 }
 
-// void loop() {
-//   digitalWrite(driveEnablePin, HIGH);
-//   if (Serial.available() > 0) {
-//     digitalWrite(driveEnablePin, LOW);
-//     for (int i = (sizeof(driveModules) / sizeof(driveModules[0])) - 1; i>=0; i--) {
-//       driveModules[i].zero();
-//       delay(1000);
-//     }
-//     digitalWrite(driveEnablePin, HIGH);
-//     delay(50000);
-//   }
-// }
-
-
-// loop() { //idek
-  // currentMicros = micros();
-  // driveModules[BASE].setPosition(round(driveModules[BASE].getCurrentAngle()) == 300 ? 0 : 300, ABSOLUTE);
-  // driveModules[SHOULDER].setPosition(round(driveModules[SHOULDER].getCurrentAngle()) == 300 ? 0 : 300, ABSOLUTE);
-  // driveModules[ELBOW].setPosition(round(driveModules[ELBOW].getCurrentAngle()) == 300 ? 0 : 300, ABSOLUTE);
-
-  // double initialTime = currentMicros;
-  // int i = 0;
-  // while ((!driveModules[BASE].isAtRest() && !driveModules[SHOULDER].isAtRest() && !driveModules[ELBOW].isAtRest())) {
-  //   currentMicros = micros();
-  //   driveModules[BASE].update(currentMicros);
-  //   driveModules[SHOULDER].update(currentMicros);
-  //   driveModules[ELBOW].update(currentMicros);
-  //   i++;
-  // }
-  // currentMicros = micros();
-  // Serial.println((String) driveModules[BASE].currentPosition + "  " + (String) driveModules[BASE].desiredPosition);
-  // Serial.println("cps of: " + (String) i + " per " + (String) ((currentMicros - initialTime)/1000000.) + " seconds");//(i / ((currentMicros - initialTime)/1000000.)));
-// }

@@ -64,6 +64,7 @@ void a4988DriveModule::zero() {
             incrementMotor();
             delay(2);
         }
+
         setPosition(0, ABSOLUTE);
         halt();
         

@@ -14,6 +14,7 @@ ThreeAxisArm::ThreeAxisArm(DriveModule& baseJoint, DriveModule& shoulderJoint, D
 
 void ThreeAxisArm::enableArm(boolean en) {
   digitalWrite(enablePin, !en);
+  if (en) zero();
 }
 
 void ThreeAxisArm::update() {
@@ -26,9 +27,8 @@ void ThreeAxisArm::halt() {
 }
 
 void ThreeAxisArm::zero() { 
-  enableArm(true);
-  for (DriveModule* module : driveModules) module->zero();
-  enableArm(false);
+  for (int i=2; i>=0; i--) driveModules[i]->enableMotor(true);
+  for (int i=2; i>=0; i--) driveModules[i]->zero();
 }
 
 // void setPosition(float x, float y, float z);

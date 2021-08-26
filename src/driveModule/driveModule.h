@@ -24,6 +24,8 @@ class DriveModule
     virtual float getCurrentAngle()=0;
     virtual float getCurrentVelocity()=0;
     
+    virtual void enableMotor(boolean enable)=0;
+
     virtual void setAngleOffset(float angleOffset)=0;
 
     virtual boolean isAtRest()=0;
