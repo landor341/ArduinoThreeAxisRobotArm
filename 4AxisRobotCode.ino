@@ -42,7 +42,7 @@ a4988DriveModule driveModules[numJoints] = {
   a4988DriveModule(motors[ELBOW], gearRatios[ELBOW], microStepRatio, maxAngles[ELBOW], limitPins[ELBOW], COUNTERCLOCKWISE)
 };
 
-ThreeAxisArm arm(driveModules[BASE], driveModules[SHOULDER], driveModules[ELBOW], driveEnablePin);
+ThreeAxisArm arm(driveModules[BASE], driveModules[SHOULDER], driveModules[ELBOW], kinematics, driveEnablePin);
 
 
 
@@ -70,18 +70,28 @@ void setup() {
   Serial.println("Initialized");
 }
 
-
-
-void loop() { //single joint testing
+void loop() {
   if (Serial.available()) {
-    Serial.println("gotchu");
-    arm.enableArm(true);
-
-    delay(3000);
-
-    arm.enableArm(false);
-    Serial.println("finished zeroing");
-    delay(100000);
+    if (arm.isAtRest()) {
+      Serial.println("Initializing Movement to 30, 30, 30");
+      arm.enableArm(true);
+      arm.setPosition(30, 30, 30);
+    } else {
+      arm.update();
+    }
   }
 }
+
+// void loop() {
+//   if (Serial.available()) {
+//     Serial.println("gotchu");
+//     arm.enableArm(true);
+
+//     delay(3000);
+
+//     arm.enableArm(false);
+//     Serial.println("finished zeroing");
+//     delay(100000);
+//   }
+// }
 

@@ -8,8 +8,8 @@
 #include "ThreeAxisArm.h"
  
 
-ThreeAxisArm::ThreeAxisArm(DriveModule& baseJoint, DriveModule& shoulderJoint, DriveModule& elbowJoint, int enablePin) 
-: driveModules{ &baseJoint, &shoulderJoint, &elbowJoint }, enablePin(enablePin)
+ThreeAxisArm::ThreeAxisArm(DriveModule& baseJoint, DriveModule& shoulderJoint, DriveModule& elbowJoint, ThreeAxisArmKinematics kinematics, int enablePin) 
+: driveModules{ &baseJoint, &shoulderJoint, &elbowJoint }, kinematics(&kinematics), enablePin(enablePin)
   {}
 
 void ThreeAxisArm::enableArm(boolean en) {
@@ -31,10 +31,26 @@ void ThreeAxisArm::zero() {
   for (int i=2; i>=0; i--) driveModules[i]->zero();
 }
 
-// void setPosition(float x, float y, float z);
-//     void setJointAngle(float angle, joints joint);
-    // boolean isAtRest();
-    // float * getPosition();
+void ThreeAxisArm::setPosition(float x, float y, float z) {
+  float destination[3] = {x, y, z};
+  float destinationAngles[3];
+  (*kinematics).inverseKinematics(destination, destinationAngles);
+  for (int i=0; i<3; i++) {
+    driveModules[i]->setPosition(destinationAngles[i], ABSOLUTE);
+  }
+}
+
+void ThreeAxisArm::setJointAngle(float angle, joints joint) {
+  driveModules[joint]->setPosition(angle, ABSOLUTE);
+}
+
+boolean ThreeAxisArm::isAtRest() {
+  for (DriveModule* module : driveModules) if (!(*module).isAtRest()) return false;
+  return true;
+}
+float * ThreeAxisArm::getPosition() {
+  
+}
 
 //            private methods
 

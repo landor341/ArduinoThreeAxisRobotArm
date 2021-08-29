@@ -12,10 +12,15 @@ class ThreeAxisArmKinematics
 {
   public:
     ThreeAxisArmKinematics(float shoulderJointLength, float elbowJointLength, float baseJointOffset, float shoulderJointOffset);
-    float * forwardKinematics(float angles[3]);
-    float * inverseKinematics(float pos[3]);
-    float * getPosition();
-    float * getAngles();
+    
+    void forwardKinematics(float angles[3], float (&posOut)[3]);
+    void forwardKinematics(float angles[3]);
+
+    void inverseKinematics(float pos[3], float (&anglesOut)[3]);
+    void inverseKinematics(float pos[3]);
+    
+    void getPosition(float (&posOut)[3]);
+    void getAngles(float (&anglesOut)[3]);
   private:
     float shoulderJointLength;
     float elbowJointLength;

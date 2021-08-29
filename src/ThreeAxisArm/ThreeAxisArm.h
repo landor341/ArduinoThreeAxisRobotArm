@@ -8,6 +8,7 @@
 
 #include "Arduino.h"
 #include "../DriveModule/DriveModule.h"
+#include "../ThreeAxisArmKinematics/ThreeAxisArmKinematics.h"
 
 enum joints {
   BASE = 0,
@@ -18,7 +19,7 @@ enum joints {
 class ThreeAxisArm
 {
   public:
-    ThreeAxisArm(DriveModule& baseJoint, DriveModule& shoulderJoint, DriveModule& elbowJoint, int enablePin);
+    ThreeAxisArm(DriveModule& baseJoint, DriveModule& shoulderJoint, DriveModule& elbowJoint, ThreeAxisArmKinematics kinematics, int enablePin);
 
     void update();
     void halt();
@@ -37,6 +38,7 @@ class ThreeAxisArm
     void moveMotor(float distance[3], positionMode posMode);
 
     DriveModule * driveModules[3];
+    ThreeAxisArmKinematics * kinematics;
     float position[3] = { 0 };
 };
 
