@@ -13,20 +13,24 @@ class ThreeAxisArmKinematics
   public:
     ThreeAxisArmKinematics(float shoulderJointLength, float elbowJointLength, float baseJointOffset, float shoulderJointOffset);
     
-    void forwardKinematics(float angles[3], float (&posOut)[3]);
-    void forwardKinematics(float angles[3]);
+    void forwardKinematics(float newAngles[3], float (&posOut)[3]);
+    void forwardKinematics(float newAngles[3]);
 
-    void inverseKinematics(float pos[3], float (&anglesOut)[3]);
-    void inverseKinematics(float pos[3]);
+    void inverseKinematics(float newPos[3], float (&anglesOut)[3]);
+    void inverseKinematics(float newPos[3]);
     
     void getPosition(float (&posOut)[3]);
     void getAngles(float (&anglesOut)[3]);
   private:
+
+    void forwardKinematics();
+    void inverseKinematics();
+
     float shoulderJointLength;
     float elbowJointLength;
     float baseJointOffset;
     float shoulderJointOffset;
-    float coords[3];
+    float pos[3];
     float angles[3];
     
     const float Pi = 3.1415926; //not overkill dw, float cuts it off too

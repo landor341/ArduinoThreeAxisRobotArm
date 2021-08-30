@@ -34,10 +34,16 @@ void ThreeAxisArm::zero() {
 void ThreeAxisArm::setPosition(float x, float y, float z) {
   float destination[3] = {x, y, z};
   float destinationAngles[3];
-  (*kinematics).inverseKinematics(destination, destinationAngles);
+  kinematics->inverseKinematics(destination, destinationAngles);
   for (int i=0; i<3; i++) {
     driveModules[i]->setPosition(destinationAngles[i], ABSOLUTE);
   }
+
+  Serial.print("Angles: ");
+  float finalAngles[3];
+  kinematics->getAngles(finalAngles);
+  for (float angle: finalAngles) Serial.print((String) angle + " ");
+  Serial.println("");
 }
 
 void ThreeAxisArm::setJointAngle(float angle, joints joint) {

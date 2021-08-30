@@ -65,6 +65,10 @@ void setup() {
   digitalWrite(driveEnablePin, HIGH);
   for (int pin : limitPins) { pinMode(pin, INPUT_PULLUP); }
 
+  driveModules[0].setAngleOffset(0);
+  driveModules[1].setAngleOffset(25.4);
+  driveModules[2].setAngleOffset(142.9);
+
   Serial.begin(9600);
   delay(1000);
   Serial.println("Initialized");
@@ -75,7 +79,9 @@ void loop() {
     if (arm.isAtRest()) {
       Serial.println("Initializing Movement to 30, 30, 30");
       arm.enableArm(true);
-      arm.setPosition(30, 30, 30);
+      Serial.println("Enabled arm");
+      arm.setPosition(70, 20, 90);
+      Serial.println("Set arm position");
     } else {
       arm.update();
     }

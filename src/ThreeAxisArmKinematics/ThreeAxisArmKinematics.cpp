@@ -12,26 +12,33 @@ ThreeAxisArmKinematics::ThreeAxisArmKinematics(float shoulderJointLength, float 
 : shoulderJointLength(shoulderJointLength), elbowJointLength(elbowJointLength),
   baseJointOffset(baseJointOffset), shoulderJointOffset(shoulderJointOffset) { }
 
-void ThreeAxisArmKinematics::forwardKinematics(float angles[3]) {
-    float currentRadians[3] = {
-      angles[0] * Pi/180,
-      (angles[1] * Pi/180),
-      (angles[2] + (180 - angles[1])) * Pi/180
-    };
-
-    float radius = (cos(currentRadians[1]) * shoulderJointLength) + (cos(currentRadians[2]) * elbowJointLength) + shoulderJointOffset;
-    coords[0] = cos(currentRadians[0]) * radius;
-    coords[1] = sin(currentRadians[0]) * radius;
-    coords[2] = ((sin(currentRadians[1]) * shoulderJointLength) + (sin(currentRadians[2]) * elbowJointLength)) + baseJointOffset;
-    
-    inverseKinematics(coords);
+void ThreeAxisArmKinematics::forwardKinematics(float newAngles[3]) {
+    for (int i=0; i<3; i++) angles[i] = newAngles[i];
+    forwardKinematics();
 }
-void ThreeAxisArmKinematics::forwardKinematics(float angles[3], float (&posOut)[3]) {
+void ThreeAxisArmKinematics::forwardKinematics(float newAngles[3], float (&posOut)[3]) {
   forwardKinematics(angles);
   getPosition(posOut);
 }
 
-void ThreeAxisArmKinematics::inverseKinematics(float pos[3]) {
+void ThreeAxisArmKinematics::inverseKinematics(float newPos[3]) {
+  for (int i=0; i<3; i++) pos[i] = newPos[i];
+  inverseKinematics();
+}
+void ThreeAxisArmKinematics::inverseKinematics(float newPos[3], float (&anglesOut)[3]) {
+  inverseKinematics(pos);
+  getAngles(anglesOut);
+}
+
+void ThreeAxisArmKinematics::getPosition(float (&posOut)[3]) {
+  for (int i=0; i<3; i++) posOut[i] = pos[i];
+}
+void ThreeAxisArmKinematics::getAngles(float (&anglesOut)[3]) {
+  for (int i=0; i<3; i++) anglesOut[i] = angles[i];
+}
+
+//Private
+void ThreeAxisArmKinematics::inverseKinematics() {
   float x = pos[0];
   float y = pos[1];
   float z = pos[2];
@@ -57,17 +64,17 @@ void ThreeAxisArmKinematics::inverseKinematics(float pos[3]) {
   // adjust for xyz vector and convert to degree
   angles[1] = ((angles[1] + theta) / Pi*180);
   angles[2] = (((angles[2]) / Pi*180) - (180 - angles[1]));
-
-  forwardKinematics(angles); //just to update internal values
-}
-void ThreeAxisArmKinematics::inverseKinematics(float pos[3], float (&anglesOut)[3]) {
-  inverseKinematics(pos);
-  getAngles(anglesOut);
 }
 
-void ThreeAxisArmKinematics::getPosition(float (&posOut)[3]) {
-  for (int i=0; i<3; i++) posOut[i] = coords[i];
-}
-void ThreeAxisArmKinematics::getAngles(float (&anglesOut)[3]) {
-  for (int i=0; i<3; i++) anglesOut[i] = angles[i];
+void ThreeAxisArmKinematics::forwardKinematics() {
+  float currentRadians[3] = {
+      angles[0] * Pi/180,
+      (angles[1] * Pi/180),
+      (angles[2] + (180 - angles[1])) * Pi/180
+    };
+
+  float radius = (cos(currentRadians[1]) * shoulderJointLength) + (cos(currentRadians[2]) * elbowJointLength);// + shoulderJointOffset;
+  pos[0] = cos(currentRadians[0]) * radius;
+  pos[1] = sin(currentRadians[0]) * radius;
+  pos[2] = ((sin(currentRadians[1]) * shoulderJointLength) + (sin(currentRadians[2]) * elbowJointLength));// + baseJointOffset;
 }
