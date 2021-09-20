@@ -38,7 +38,7 @@ class ThreeAxisArm
     void moveMotor(float distance[3], positionMode posMode);
 
     DriveModule * driveModules[3];
-    ThreeAxisArmKinematics * kinematics;
+    ThreeAxisArmKinematics kinematics;
     float position[3] = { 0 };
 };
 

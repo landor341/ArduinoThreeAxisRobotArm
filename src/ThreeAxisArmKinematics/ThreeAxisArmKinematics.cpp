@@ -5,6 +5,7 @@
 
 #include "Arduino.h"
 #include "ThreeAxisArmKinematics.h"
+#include "math.h"
 
 
 
@@ -17,7 +18,7 @@ void ThreeAxisArmKinematics::forwardKinematics(float newAngles[3]) {
     forwardKinematics();
 }
 void ThreeAxisArmKinematics::forwardKinematics(float newAngles[3], float (&posOut)[3]) {
-  forwardKinematics(angles);
+  forwardKinematics(newAngles);
   getPosition(posOut);
 }
 
@@ -26,7 +27,7 @@ void ThreeAxisArmKinematics::inverseKinematics(float newPos[3]) {
   inverseKinematics();
 }
 void ThreeAxisArmKinematics::inverseKinematics(float newPos[3], float (&anglesOut)[3]) {
-  inverseKinematics(pos);
+  inverseKinematics(newPos);
   getAngles(anglesOut);
 }
 

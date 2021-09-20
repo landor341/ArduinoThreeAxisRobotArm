@@ -74,14 +74,20 @@ void setup() {
   Serial.println("Initialized");
 }
 
+bool began = false;
+
 void loop() {
   if (Serial.available()) {
     if (arm.isAtRest()) {
+      if (began) delay(30000);
+      
       Serial.println("Initializing Movement to 30, 30, 30");
       arm.enableArm(true);
       Serial.println("Enabled arm");
-      arm.setPosition(70, 20, 90);
+      delay(5000);
+      arm.setPosition(50, 50, 90);
       Serial.println("Set arm position");
+      began = true;
     } else {
       arm.update();
     }
@@ -90,13 +96,21 @@ void loop() {
 
 // void loop() {
 //   if (Serial.available()) {
-//     Serial.println("gotchu");
-//     arm.enableArm(true);
+//     float destination[3] = {50, 50, 90};
+//     float destinationAngles[3];
+//     kinematics.inverseKinematics(destination, destinationAngles);
 
-//     delay(3000);
+//     Serial.print("Angles: ");
+//     for (float angle: destinationAngles) Serial.print((String) angle + " ");
+//     Serial.println("");
 
-//     arm.enableArm(false);
-//     Serial.println("finished zeroing");
+//     Serial.print("Angles: ");
+//     float finalAngles[3];
+//     kinematics.getAngles(finalAngles);
+//     for (float angle: finalAngles) Serial.print((String) angle + " ");
+//     Serial.println("");
+
+//     Serial.println();
 //     delay(100000);
 //   }
 // }

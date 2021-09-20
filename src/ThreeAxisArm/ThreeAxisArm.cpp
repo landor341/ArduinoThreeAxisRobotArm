@@ -9,7 +9,7 @@
  
 
 ThreeAxisArm::ThreeAxisArm(DriveModule& baseJoint, DriveModule& shoulderJoint, DriveModule& elbowJoint, ThreeAxisArmKinematics kinematics, int enablePin) 
-: driveModules{ &baseJoint, &shoulderJoint, &elbowJoint }, kinematics(&kinematics), enablePin(enablePin)
+: driveModules{ &baseJoint, &shoulderJoint, &elbowJoint }, kinematics(kinematics), enablePin(enablePin)
   {}
 
 void ThreeAxisArm::enableArm(boolean en) {
@@ -34,15 +34,13 @@ void ThreeAxisArm::zero() {
 void ThreeAxisArm::setPosition(float x, float y, float z) {
   float destination[3] = {x, y, z};
   float destinationAngles[3];
-  kinematics->inverseKinematics(destination, destinationAngles);
+  kinematics.inverseKinematics(destination, destinationAngles);
   for (int i=0; i<3; i++) {
     driveModules[i]->setPosition(destinationAngles[i], ABSOLUTE);
   }
 
   Serial.print("Angles: ");
-  float finalAngles[3];
-  kinematics->getAngles(finalAngles);
-  for (float angle: finalAngles) Serial.print((String) angle + " ");
+  for (float angle: destinationAngles) Serial.print((String) angle + " ");
   Serial.println("");
 }
 
