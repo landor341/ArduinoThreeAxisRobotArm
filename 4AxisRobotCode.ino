@@ -24,14 +24,16 @@ const unsigned int stepPins[numJoints] = {2, 3, 4};
 const unsigned int limitPins[numJoints] = {9, 10, 11};
 const int driveEnablePin = 8;
 
-int maxTPS[numJoints] = {3000, 1200, 1200};
+// int maxTPS[numJoints] = {3000, 1200, 1200};
+int maxTPS[numJoints] = {150, 150, 150};
+int maxAccel = 80;
 
 ThreeAxisArmKinematics kinematics(130, 160, 142.9, 25.4); 
 
 stepperMotor motors[numJoints] = {
-  stepperMotor(driveEnablePin, dirPins[BASE], stepPins[BASE], 200, 3000, 200),
-  stepperMotor(driveEnablePin, dirPins[SHOULDER], stepPins[SHOULDER], 200, 100, 200),
-  stepperMotor(driveEnablePin, dirPins[ELBOW], stepPins[ELBOW], 200, 100, 200)
+  stepperMotor(driveEnablePin, dirPins[BASE], stepPins[BASE], 200, maxTPS[0], maxAccel),
+  stepperMotor(driveEnablePin, dirPins[SHOULDER], stepPins[SHOULDER], 200, maxTPS[1], maxAccel),
+  stepperMotor(driveEnablePin, dirPins[ELBOW], stepPins[ELBOW], 200, maxTPS[2], maxAccel)
 };
 
 int maxAngles[numJoints] = {170, 90, 90};
@@ -72,21 +74,37 @@ void setup() {
   Serial.begin(9600);
   delay(1000);
   Serial.println("Initialized");
+  arm.enableArm(true);
+  Serial.println("Enabled arm");
 }
 
 bool began = false;
+int state = 0;
 
 void loop() {
   if (Serial.available()) {
     if (arm.isAtRest()) {
-      if (began) delay(30000);
-      
-      Serial.println("Initializing Movement to 30, 30, 30");
-      arm.enableArm(true);
-      Serial.println("Enabled arm");
-      delay(5000);
-      arm.setPosition(50, 50, 90);
-      Serial.println("Set arm position");
+      if (began) delay(5000);
+      if (state == 0) {
+        arm.setPosition(100, 100, 80);
+        Serial.println("Set arm position to 50 50 50");
+      } else if (state == 1) {
+        arm.setPosition(70, 70, 100);
+        Serial.println("Set arm position to 50 50 200");
+      } else if (state == 2) {
+        arm.setPosition(50, 50, 50);
+        Serial.println("Set arm position to 50 50 50");
+      } else if (state == 3) {
+        arm.setPosition(50, 200, 50);
+        Serial.println("Set arm position to 50 200 50");
+      } else if (state == 4) {
+        arm.setPosition(50, 50, 50);
+        Serial.println("Set arm position to 50 50 50");
+      } else if (state == 5) {
+        arm.setPosition(200, 50, 50);
+        Serial.println("Set arm position to 200 50 50");
+      }
+      state = 0;//state == 5 ? 0 : state + 1;
       began = true;
     } else {
       arm.update();

@@ -37,6 +37,7 @@ void ThreeAxisArm::setPosition(float x, float y, float z) {
   kinematics.inverseKinematics(destination, destinationAngles);
   for (int i=0; i<3; i++) {
     driveModules[i]->setPosition(destinationAngles[i], ABSOLUTE);
+    Serial.println("currentAngle on motor " + (String) i + ": " + (String) driveModules[i]->getCurrentAngle());
   }
 
   Serial.print("Angles: ");

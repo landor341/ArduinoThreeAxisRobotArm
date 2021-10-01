@@ -34,7 +34,7 @@ boolean a4988DriveModule::isAtRest() { return currentPosition == desiredPosition
 boolean a4988DriveModule::setPosition(float distance, positionMode posMode, motorUnits units) {
     if (posMode == ABSOLUTE) {
         if (units == TICKS) desiredPosition = (int) distance;
-        else if (units == ANGLE) desiredPosition = (int) degreesToTicks(distance); 
+        else if (units == ANGLE) desiredPosition = (int) degreesToTicks(distance - angleOffset); 
     } else if (posMode == RELATIVE) {
         if (units == TICKS) desiredPosition = currentPosition + (int) distance;
         else if (units == ANGLE) desiredPosition = currentPosition + (int) degreesToTicks(distance);
@@ -89,10 +89,11 @@ void a4988DriveModule::update(double microsTime) {
 
     double timeChange = (microsTime - lastIncrementTime);
 
-    float ticksRemaining = desiredPosition - currentPosition;
+    float ticksRemaining = abs(desiredPosition - currentPosition);
     float minimumDistanceToZero = sq(currentVelocity) / (2 * acceleration);
     boolean deccelerate = minimumDistanceToZero >= ticksRemaining - 1;
 
+    
     currentVelocity = min(maxVelocity, max(1, currentVelocity + (int) round(acceleration * (deccelerate ? -1 : 1))));
 
     if ((float) (timeChange / 1000000)  >= (1 / (float) currentVelocity)) { //if seconds passed is more than current seconds per tick
@@ -115,7 +116,7 @@ boolean a4988DriveModule::incrementMotor() { //TODO: add limit testing
     if ((atSwitch() && motorClockwise == dirToSwitch) || currentPosition > maxTicks) halt();
 }
 float a4988DriveModule::ticksToDegrees(int ticks) { return currentPosition / (float) ticksPerRevolution * 360; }
-int a4988DriveModule::degreesToTicks(float angle) { return (int) ((angle - angleOffset) * ticksPerRevolution / 360); }
+int a4988DriveModule::degreesToTicks(float angle) { return (int) ((angle) * ticksPerRevolution / 360); }
 int a4988DriveModule::rotationsToTicks(float rotations) { return rotations * ticksPerRevolution; }
 int a4988DriveModule::ticksToRotations(int ticks) { return ticks / ticksPerRevolution; }
 bool a4988DriveModule::atSwitch() { return !digitalRead(limitPin); }

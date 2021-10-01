@@ -1,5 +1,5 @@
 /*
-  StepperDriveModule.h - generic interface for StepperDriveModules to implement.
+  StepperDriveModule.h - generic interface for StepperDriveModules to implement. Can also be used a dummy drive modules
   Created by Landon R. Faris, June 2, 2021.
 */
 
@@ -69,7 +69,7 @@ class StepperDriveModule : public DriveModule
     direction dirToSwitch;
     unsigned int maxTPS;
     unsigned int acceleration;
-    unsigned int maxTicks;
+    // unsigned int maxTicks;
 
     int ticksPerRevolution;
 
