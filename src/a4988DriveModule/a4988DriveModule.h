@@ -14,14 +14,19 @@ class a4988DriveModule : public DriveModule
 {
   public:
 
+    /**
+     * maxAngle: max degrees the motor can turn from the starting position
+    */
     a4988DriveModule(stepperMotor motor, int gearRatio, int microStepsPerStep, float maxAngle, int limitPin, direction dirToSwitch);
     
     int getCurrentSteps();
     float getCurrentAngle();
     float getCurrentVelocity();
+    float getMaxAngle();
+    float getMinAngle();
 
     void enableMotor(boolean enable);
-    void setAngleOffset(float angleOffset);
+    void setAngleOffset(float offset);
 
     boolean isAtRest();
     

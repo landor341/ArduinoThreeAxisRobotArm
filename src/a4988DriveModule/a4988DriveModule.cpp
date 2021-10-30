@@ -16,6 +16,7 @@ a4988DriveModule::a4988DriveModule(stepperMotor motor, int gearRatio, int microS
     maxVelocity((int) round(motor.maxVelocity)),
     acceleration((int) (motor.accelerationLimit * microStepsPerStep)),
     ticksPerRevolution((int) (motor.ticksPerRevolution * gearRatio * microStepsPerStep)),
+    maxAngle(maxAngle),
     maxTicks(degreesToTicks(maxAngle))
 {
     setDir(motorClockwise);
@@ -23,7 +24,7 @@ a4988DriveModule::a4988DriveModule(stepperMotor motor, int gearRatio, int microS
 int a4988DriveModule::getCurrentSteps() { return currentPosition; }
 float a4988DriveModule::getCurrentAngle() { return ticksToDegrees(currentPosition) + angleOffset; }
 float a4988DriveModule::getCurrentVelocity() { return currentVelocity; }
-void a4988DriveModule::setAngleOffset(float angleOffset) { angleOffset = angleOffset; }
+void a4988DriveModule::setAngleOffset(float offset) { angleOffset = offset; }
 void a4988DriveModule::enableMotor(boolean enable) { motorEnabled = enable; }
 
 void a4988DriveModule::setDir(boolean clockwise) {
@@ -115,6 +116,8 @@ boolean a4988DriveModule::incrementMotor() { //TODO: add limit testing
     }
     if ((atSwitch() && motorClockwise == dirToSwitch) || currentPosition > maxTicks) halt();
 }
+float a4988DriveModule::getMaxAngle() { return maxAngle; }
+float a4988DriveModule::getMinAngle() { return angleOffset; }
 float a4988DriveModule::ticksToDegrees(int ticks) { return currentPosition / (float) ticksPerRevolution * 360; }
 int a4988DriveModule::degreesToTicks(float angle) { return (int) ((angle) * ticksPerRevolution / 360); }
 int a4988DriveModule::rotationsToTicks(float rotations) { return rotations * ticksPerRevolution; }

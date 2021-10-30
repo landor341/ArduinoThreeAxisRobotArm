@@ -74,43 +74,18 @@ void setup() {
   Serial.begin(9600);
   delay(1000);
   Serial.println("Initialized");
-  arm.enableArm(true);
-  Serial.println("Enabled arm");
+  // arm.enableArm(true);
+  // Serial.println("Enabled arm");
 }
-
-bool began = false;
-int state = 0;
 
 void loop() {
   if (Serial.available()) {
-    if (arm.isAtRest()) {
-      if (began) delay(5000);
-      if (state == 0) {
-        arm.setPosition(100, 100, 80);
-        Serial.println("Set arm position to 50 50 50");
-      } else if (state == 1) {
-        arm.setPosition(70, 70, 100);
-        Serial.println("Set arm position to 50 50 200");
-      } else if (state == 2) {
-        arm.setPosition(50, 50, 50);
-        Serial.println("Set arm position to 50 50 50");
-      } else if (state == 3) {
-        arm.setPosition(50, 200, 50);
-        Serial.println("Set arm position to 50 200 50");
-      } else if (state == 4) {
-        arm.setPosition(50, 50, 50);
-        Serial.println("Set arm position to 50 50 50");
-      } else if (state == 5) {
-        arm.setPosition(200, 50, 50);
-        Serial.println("Set arm position to 200 50 50");
-      }
-      state = 0;//state == 5 ? 0 : state + 1;
-      began = true;
-    } else {
-      arm.update();
-    }
+    printPositionExtrema();
+    delay(10e4);
   }
 }
+
+
 
 // void loop() {
 //   if (Serial.available()) {
@@ -133,3 +108,21 @@ void loop() {
 //   }
 // }
 
+void printPositionExtrema() {
+  for (int j=0; j<2; j++) {
+    float test[3] {};
+    float out[3];
+
+    for (int i=0; i<3; i++) { 
+      test[i] = j==0 ? driveModules[i].getMinAngle() : driveModules[i].getMaxAngle();
+      Serial.println((String) (j==0 ? driveModules[i].getMinAngle() : driveModules[i].getMaxAngle()));
+    }
+
+    kinematics.inverseKinematics(test, out);
+    for (int i=1; i<4; i++) { 
+      Serial.print(j==0 ? "[Min Position " : "[Max Position ");
+      Serial.print((String) i + ": " + (String) out[i-1] + "] ");
+    }
+    Serial.println("");
+  }
+}

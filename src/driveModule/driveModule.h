@@ -23,6 +23,8 @@ class DriveModule
   public:
     virtual float getCurrentAngle()=0;
     virtual float getCurrentVelocity()=0;
+    virtual float getMaxAngle()=0;
+    virtual float getMinAngle()=0;
     
     virtual void enableMotor(boolean enable)=0;
 
