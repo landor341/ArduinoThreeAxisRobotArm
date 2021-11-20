@@ -30,7 +30,9 @@ boolean GCodeInterpreter::interpretCommandString(String str) {
     while (currentParameter != 7 && currentIndex < stringLength) {
         if (codeNum == 255) {
             if (isWhitespace(str[currentIndex])) {
-                for (int i=lastUsedIndex+1; i < (currentIndex-1) - (lastUsedIndex+1); i++) if (isalpha(str[i])) return false;
+                //"G00" is a real command code but "G0L" is not. Checked using isalpha()
+                for (int i=lastUsedIndex+1; i < (currentIndex-1); i++) if (isalpha(str[i])) return false;
+
                 codeNum = str.substring(lastUsedIndex, currentIndex - 1).toInt();
                 lastUsedIndex = currentIndex;
             } else if (isalpha(str[currentIndex])) return false;
@@ -38,7 +40,7 @@ boolean GCodeInterpreter::interpretCommandString(String str) {
             if (isalpha(str[currentIndex])) {
                 foundIdentifier = true;
                 lastUsedIndex = currentIndex;
-            } else if (isWhitespace(str[currentIndex])) {
+            } else if (isWhitespace(str[currentIndex]) && foundIdentifier) {
                 for (int i=lastUsedIndex+1; i < (currentIndex-1) - (lastUsedIndex+1); i++) if (isalpha(str[i])) return false;
                 commandParameters[currentParameter] = GCodeCommandField(str[lastUsedIndex], str.substring(lastUsedIndex + 1, currentIndex - 1).toInt());
 

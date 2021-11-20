@@ -12,3 +12,6 @@ M Codes
 Syntax 	Definition
 M100 	Close grip.
 M101 	Open grip.
+
+
+Never use G255 or M255 as the 255 codenumber is used internally

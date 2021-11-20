@@ -1,2 +1,4 @@
 # ignore vscode arduino plugin config
 *.vscode
+.gitignore
+Old stuff for notes.txt
