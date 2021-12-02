@@ -45,7 +45,7 @@ boolean GCodeInterpreter::interpretCommandString(String str) {
 
                 foundIdentifier = true;
                 lastUsedIndex = currentIndex;
-            } else if (isWhitespace(str[currentIndex]) || currentIndex + 1 == stringLength) {
+            } else if (foundIdentifier && (isWhitespace(str[currentIndex]) || currentIndex + 1 == stringLength)) {
                 for (int i=lastUsedIndex+1; i < (currentIndex); i++) if (isalpha(str[i])) return false;
                 commandParameters[currentParameter] = GCodeCommandField(str[lastUsedIndex], str.substring(lastUsedIndex + 1, currentIndex - 1).toInt());
 
