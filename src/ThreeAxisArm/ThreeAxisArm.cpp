@@ -23,7 +23,7 @@ void ThreeAxisArm::update() {
 }
 void ThreeAxisArm::halt() { 
   for (DriveModule* module : driveModules) module->halt(); 
-  enableArm(false);
+  enableArm(false); 
 }
 
 void ThreeAxisArm::zero() { 

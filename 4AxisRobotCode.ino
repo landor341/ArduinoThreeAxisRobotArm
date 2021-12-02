@@ -115,7 +115,7 @@ void printPositionExtrema() {
 
     for (int i=0; i<3; i++) { 
       test[i] = j==0 ? driveModules[i].getMinAngle() : driveModules[i].getMaxAngle();
-      Serial.println((String) (j==0 ? driveModules[i].getMinAngle() : driveModules[i].getMaxAngle()));
+      // Serial.println((String) (j==0 ? driveModules[i].getMinAngle() : driveModules[i].getMaxAngle()));
     }
 
     kinematics.inverseKinematics(test, out);

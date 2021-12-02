@@ -18,28 +18,35 @@ boolean GCodeInterpreter::interpretCommandString(String str) {
     else return false;
 
     unsigned int stringLength = sizeof(str)/sizeof(str[0]);
-    int lastUsedIndex = 0;
-    int currentIndex = 1;
+    unsigned int lastUsedIndex = 0;
+    unsigned int currentIndex = 1;
 
-    uint8_t codeNum = 255;
+    uint8_t codeNum = NULL;
     
     GCodeCommandField commandParameters[7] = {GCodeCommandField()};
     uint8_t currentParameter = 0;
     bool foundIdentifier = false;
 
-    while (currentParameter != 7 && currentIndex < stringLength) {
-        if (codeNum == 255) {
-            if (isWhitespace(str[currentIndex])) {
-                for (int i=lastUsedIndex+1; i < (currentIndex-1) - (lastUsedIndex+1); i++) if (isalpha(str[i])) return false;
+    //After it finds a "word" between an alpha identifier and the next whitespace it'll set the code/parameter and search for the next one  
+    while (currentParameter < 7 && currentIndex < stringLength) {
+        
+        
+        if (codeNum == NULL) {
+            if (isWhitespace(str[currentIndex]) || currentIndex + 1 == stringLength) {
+                for (int i=lastUsedIndex+1; i < (currentIndex); i++) if (isalpha(str[i])) return false;
+                //last used index is 0, currentIndex is the sapce at the end of the code identifier ex. "G155 "
                 codeNum = str.substring(lastUsedIndex, currentIndex - 1).toInt();
                 lastUsedIndex = currentIndex;
-            } else if (isalpha(str[currentIndex])) return false;
+            } else if (isalpha(str[currentIndex])) return false; //assumes index 0 is the initial identifier
+
         } else {
-            if (isalpha(str[currentIndex])) {
+            if (isalpha(str[currentIndex])) { //Command parameter identifier
+                if (foundIdentifier) return false; //alpha char where it shouldnt be
+
                 foundIdentifier = true;
                 lastUsedIndex = currentIndex;
-            } else if (isWhitespace(str[currentIndex])) {
-                for (int i=lastUsedIndex+1; i < (currentIndex-1) - (lastUsedIndex+1); i++) if (isalpha(str[i])) return false;
+            } else if (isWhitespace(str[currentIndex]) || currentIndex + 1 == stringLength) {
+                for (int i=lastUsedIndex+1; i < (currentIndex); i++) if (isalpha(str[i])) return false;
                 commandParameters[currentParameter] = GCodeCommandField(str[lastUsedIndex], str.substring(lastUsedIndex + 1, currentIndex - 1).toInt());
 
                 currentParameter++;
